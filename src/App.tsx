@@ -1,59 +1,37 @@
-import React from "react";
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
-import { ProductAPI } from "./api/product/productAPI";
+import { BrowserRouter as Router, Route, Routes, BrowserRouter } from "react-router-dom";
 
-import { Button } from "@mantine/core";
-import CardComponent from "./components/Card";
+import { Navigate } from "react-router-dom";
+
+import Home from "./pages/Dashboard";
+import About from "./pages/About";
+import Header from "./components/Header";
+
+import Login from "./pages/Login";
+import { PrivateRoute } from "./auth/PrivateRoute";
+import Layout from "./layout/layout";
+import CreateProductView from "./pages/product/createProduct";
 
 function App() {
-  const [count, setCount] = useState(0);
-  const [products, setProduct] = useState([]);
+  let isLogged = localStorage.getItem("access_token");
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
+    <Router>
+      {/* <Header /> */}
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Layout />}>
+          <Route index element={isLogged != null ? <Home /> : <Navigate to="/login" />} />
+          <Route path="/create-product" element={<CreateProductView />} />
+        </Route>
 
-      <Button
-        onClick={async () => {
-          let ss: any = await ProductAPI.getAllProducts();
-          setProduct(ss.data.products);
-        }}
-      >
-        HEHE
-      </Button>
-
-      {products.map((productItem: any) => {
-        return <CardComponent title={productItem.title} imageSRC={productItem.imagesObject[0].path}></CardComponent>;
-      })}
-
-      {/* <Button
-        onClick={async () => {
-          var response = await ProductAPI.getAllProducts();
-          console.log("response", response);
-        }}
-      >
-        TEST
-      </Button> */}
-
-      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
-    </>
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+      {/* <Routes path="/" element={<Layout></Layout>}>
+        <Route path="/" element={isLogged != null ? <Home /> : <Navigate to="/login" />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes> */}
+    </Router>
   );
 }
 
